@@ -1,24 +1,23 @@
 import { Injectable } from '@angular/core';
 import { Storage } from '@ionic/storage';
-import { IonicStorageModule } from '@ionic/storage';
 @Injectable({
   providedIn: 'root'
 })
 export class StorageService {
-  constructor() {}
+  constructor(private storage: Storage) {}
 
   // Store the value
   async store(storageKey: string, value: any) {
     const encryptedValue = btoa(escape(JSON.stringify(value)));
-    await Storage.set({
-      key: storageKey,
-      value: encryptedValue
-    });
+    await this.storage.set(
+      storageKey,
+      encryptedValue
+    );
   }
 
   // Get the value
   async get(storageKey: string) {
-    const ret = await Storage.get({ key: storageKey });
+    const ret = await this.storage.get(storageKey);
     if (ret.value) {
       return JSON.parse(unescape(atob(ret.value)));
     } else {
@@ -26,25 +25,12 @@ export class StorageService {
     }
   }
 
-  // JSON "get" example
-  async getObject() {
-    const ret = await Storage.get({ key: 'user' });
-    const user = JSON.parse(ret.value);
-  }
-
-  async setItem() {
-    await Storage.set({
-      key: 'name',
-      value: 'Max'
-    });
-  }
-
   async keys() {
-    const keys = await Storage.keys();
+    const keys = await this.storage.keys();
     console.log('Got keys: ', keys);
   }
 
   async clear() {
-    await Storage.clear();
+    await this.storage.clear();
   }
 }
