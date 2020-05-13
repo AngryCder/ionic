@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AngularAgoraRtcService, Stream } from 'angular-agora-rtc';
+import { AfterViewInit, ElementRef, ViewChild } from '@angular/core';
+import {Renderer2} from '@angular/core';
+
 
 @Component({
   selector: 'app-messages',
@@ -11,10 +14,11 @@ export class MessagesPage implements OnInit {
  localStream: Stream // Add
  Channel_name: String 
  remoteCalls: any = [];
+  @ViewChild('agora_local',{static: false}) private element : ElementRef;
 
   // Add
   constructor(
-    private agoraService: AngularAgoraRtcService
+    private agoraService: AngularAgoraRtcService,    private renderer: Renderer2
   ) {
     this.agoraService.createClient();
   }
@@ -30,13 +34,6 @@ export class MessagesPage implements OnInit {
 
   // Add
   private subscribeToStreams() {
-    this.localStream.on("accessAllowed", () => {
-      console.log("accessAllowed");
-    });
-    // The user has denied access to the camera and mic.
-    this.localStream.on("accessDenied", () => {
-      console.log("accessDenied");
-    });
 
     this.localStream.init(() => {
       console.log("getUserMedia successfully");
@@ -97,12 +94,18 @@ export class MessagesPage implements OnInit {
     });
   }
 
+
   leave() {
     this.agoraService.client.leave(() => {
       console.log("Leavel channel successfully");
     }, (err) => {
       console.log("Leave channel failed");
     });
+       console.log("hello");
+    console.log(this.remoteCalls);
+    for (let child of this.element.nativeElement.children) {
+  this.renderer.removeChild(this.element.nativeElement, child);
+}
   }
   ngOnInit() {
   }
